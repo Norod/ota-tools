@@ -73,6 +73,7 @@ plutil -convert xml1 Payload/*.app/Info.plist -o Info.plist
 
 echo " "
 echo "Current Info.plist"
+echo "------------------"
 echo "BundleDisplayName: '$(/usr/libexec/PlistBuddy -c 'Print :CFBundleDisplayName' Info.plist)'"
 echo "BundleIdentifier:  '$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' Info.plist)'"
 echo "Version:  $(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Info.plist) (Build $(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' Info.plist))"
@@ -81,8 +82,18 @@ security cms -D -i Payload/*.app/embedded.mobileprovision > mobileprovision.plis
 
 echo " "
 echo "Current mobileprovision.plist"
+echo "-----------------------------"
 echo "Signed for: '$(/usr/libexec/PlistBuddy -c "Print :Name" mobileprovision.plist)' with Application ID: '$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" mobileprovision.plist)' By: '$(/usr/libexec/PlistBuddy -c "Print :TeamName" mobileprovision.plist)'"
 echo "Profile UUID='$(/usr/libexec/PlistBuddy -c 'Print :UUID' mobileprovision.plist)'"
+
+codesign -d --entitlements :- Payload/*.app/ > entitlements.xcent 
+
+echo " "
+echo "Current entitlements (in xcent format)"
+echo "--------------------------------------"
+cat entitlements.xcent
+echo " "
+
 
 if [[ ! ($INSPECT_ONLY == 1) ]]; then
     CERTIFICATE="$3"
